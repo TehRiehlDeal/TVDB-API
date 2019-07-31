@@ -1,2 +1,3 @@
 config.ini
 database.db
+__pycache__/*
