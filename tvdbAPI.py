@@ -3,6 +3,7 @@ import sanction
 import configparser
 import sqlite3
 
+
 config = configparser.ConfigParser()
 config.read('config.ini')
 
@@ -43,28 +44,28 @@ class TVDB:
         r = self.session.post(self.config['loginURL'], json=self.config['authPayload'], headers=self.headers).json()
         error = r.get('Error')
         if error:
-            raise(error)
+            raise(Exception)
         token = r.get('token')
         self.headers['Authorization'] = 'Bearer {}'.format(token)
         self.__authorized = True
 
-
-
-
-
-
-
-
-
-
-
-
     def getShow(self, name):
-        pass
+        if not self.__authorized:
+            self.authorize()
+        params = {
+            "name": name
+        }
+        r = self.session.get(self.config['searchEndpoint'], params=params, headers=self.headers).json()
+        error = r.get('Error')
+        if error:
+            raise(Exception)
+        return r
+        
     def getEpisodes(self, name):
         pass
-    def getEpisodeName(self, name, epNum):
-        pass
+    def getEpisodeName(self, name, seasonNum, epNum):
+        id = self._getShowID(name)
+        return self._getEpisodeName(id, seasonNum, epNum)
     def cleanName(self, name):
         newName = name.replace('\\', "")
         newName = newName.replace("/", "")
@@ -76,3 +77,29 @@ class TVDB:
         newName = newName.replace(">", "")
         newName = newName.replace("|", "")
         return newName
+
+
+    def _getShowID(self, name):
+        if not self.__authorized:
+            self.authorize()
+        params = {
+            'name': name
+        }
+
+        r = self.session.get(self.config['searchEndpoint'], params=params, headers=self.headers).json()
+        error = r.get('Error')
+        if error:
+            raise(Exception)
+        return r['data'][0]['id']
+
+    def _getEpisodeName(self, id, seasonNum, epNum):
+        params = {
+            'airedSeason': seasonNum,
+            'airedEpisode': epNum
+        }
+        r = self.session.get(self.config['seriesEndpoint'] + "/{}/episodes/query".format(id), params=params, headers=self.headers).json()
+        error = r.get('Error')
+        if error:
+            raise(Exception)
+        return r['data'][0]['episodeName']
+        
