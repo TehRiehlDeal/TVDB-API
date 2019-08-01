@@ -11,6 +11,20 @@ conn = sqlite3.connect('database.db')
 
 c = conn.cursor()
 
+#Exceptions
+class Error(Exception):
+    pass
+
+class invalidCredentials(Error):
+    pass
+
+class showNotFound(Error):
+    pass
+
+class noSuchEpisode(Error):
+    pass
+
+#Main TVDB object
 class TVDB:
 
     def __init__(self, apikey=config['CREDENTIALS']['APIKEY']):
@@ -44,7 +58,7 @@ class TVDB:
         r = self.session.post(self.config['loginURL'], json=self.config['authPayload'], headers=self.headers).json()
         error = r.get('Error')
         if error:
-            raise(Exception)
+            raise invalidCredentials
         token = r.get('token')
         self.headers['Authorization'] = 'Bearer {}'.format(token)
         self.__authorized = True
@@ -58,30 +72,19 @@ class TVDB:
         r = self.session.get(self.config['searchEndpoint'], params=params, headers=self.headers).json()
         error = r.get('Error')
         if error:
-            raise(Exception)
+            raise showNotFound
         return r
         
     def getEpisodes(self, name):
         pass
+
     def getEpisodeName(self, name, seasonNum, epNum):
-        id = self._getShowID(name)
-        return self._getEpisodeName(id, seasonNum, epNum)
-    def cleanName(self, name):
-        newName = name.replace('\\', "")
-        newName = newName.replace("/", "")
-        newName = newName.replace(":", "")
-        newName = newName.replace("*", "")
-        newName = newName.replace("?", "")
-        newName = newName.replace('"', "")
-        newName = newName.replace("<", "")
-        newName = newName.replace(">", "")
-        newName = newName.replace("|", "")
-        return newName
-
-
-    def _getShowID(self, name):
         if not self.__authorized:
             self.authorize()
+        id = self._getShowID(name)
+        return self._getEpisodeName(id, seasonNum, epNum)
+
+    def _getShowID(self, name):
         params = {
             'name': name
         }
@@ -100,6 +103,17 @@ class TVDB:
         r = self.session.get(self.config['seriesEndpoint'] + "/{}/episodes/query".format(id), params=params, headers=self.headers).json()
         error = r.get('Error')
         if error:
-            raise(Exception)
-        return r['data'][0]['episodeName']
-        
+            raise noSuchEpisode
+        return self.cleanName(r['data'][0]['episodeName'])
+
+    def cleanName(self, name):
+        newName = name.replace('\\', "")
+        newName = newName.replace("/", "")
+        newName = newName.replace(":", "")
+        newName = newName.replace("*", "")
+        newName = newName.replace("?", "")
+        newName = newName.replace('"', "")
+        newName = newName.replace("<", "")
+        newName = newName.replace(">", "")
+        newName = newName.replace("|", "")
+        return newName
