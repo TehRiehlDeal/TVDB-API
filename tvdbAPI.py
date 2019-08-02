@@ -1,15 +1,10 @@
 import requests
 import sanction
 import configparser
-import sqlite3
 
 
 config = configparser.ConfigParser()
 config.read('config.ini')
-
-conn = sqlite3.connect('database.db')
-
-c = conn.cursor()
 
 #Exceptions
 class Error(Exception):
