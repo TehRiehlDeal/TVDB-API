@@ -26,14 +26,13 @@ class TestCase(unittest.TestCase):
         with self.assertRaises(invalidInput):
             self.t.getShow(-1)
 
-
-"""
     def testD(self):
-        assert self.t.getShow({'test': "test"}) == -1
-    
+        with self.assertRaises(invalidInput):
+            self.t.getShow({'test': "test"})
+
     def testE(self):
-        assert self.t.getShow(["a", "b", "c"]) == -1
-"""
+        with self.assertRaises(invalidInput):
+            assert self.t.getShow(["a", "b", "c"])
 
 if __name__ == "__main__":
     unittest.main()
