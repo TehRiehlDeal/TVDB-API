@@ -119,10 +119,14 @@ class TVDB:
             'airedSeason': seasonNum,
             'airedEpisode': epNum
         }
-        r = self.session.get(self.config['seriesEndpoint'] + "/{}/episodes/query".format(id), params=params, headers=self.headers).json()
-        error = r.get('Error')
-        if error:
-            raise noSuchEpisode
+        try:
+            r = self.session.get(self.config['seriesEndpoint'] + "/{}/episodes/query".format(id), params=params, headers=self.headers).json()
+            error = r.get('Error')
+            if error:
+                raise noSuchEpisode
+        except noSuchEpisode:
+            print("No epsiode could be found. Please check season or episode number and try again.")
+            return -1
         return self.cleanName(r['data'][0]['episodeName'])
 
     def cleanName(self, name):
