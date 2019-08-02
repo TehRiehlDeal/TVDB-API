@@ -79,10 +79,11 @@ class TVDB:
         return r
         
     def getEpisodes(self, name):
+        if type(name) is not str:
+            raise invalidInput(
+                "You have entered an invalid name. Please try again.")
         if not self.__authorized:
             self.authorize()
-        if type(name) is not str:
-            raise invalidInput("You have entered an invalid name. Please try again.")
         id = self._getShowID(name)
         if id == -1:
             raise invalidShowID("Show was not found, please try again")
@@ -97,8 +98,10 @@ class TVDB:
                 episodes.append(episode)
         return episodes
 
-
     def getEpisodeName(self, name, seasonNum, epNum):
+        if type(name) is not str or type(seasonNum) is not int or type(epNum) is not int or seasonNum < 0 or epNum < 1:
+            raise invalidInput(
+                "You have entered an invalid name. Please try again.")
         if not self.__authorized:
             self.authorize()
         id = self._getShowID(name)
@@ -110,7 +113,6 @@ class TVDB:
         params = {
             'name': name
         }
-
         r = self.session.get(self.config['searchEndpoint'], params=params, headers=self.headers).json()
         error = r.get('Error')
         if error:
