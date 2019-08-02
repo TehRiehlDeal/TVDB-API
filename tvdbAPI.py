@@ -83,7 +83,7 @@ class TVDB:
             self.authorize()
         id = self._getShowID(name)
         if id == -1:
-            raise invalidShowID
+            raise invalidShowID("Show was not found, please try again")
         pages = self.session.get(self.config['seriesEndpoint'] + f"{id}/episodes", headers=self.headers).json()['links']['last']
         episodes = []
         for x in range(1,pages+1):
@@ -92,7 +92,6 @@ class TVDB:
             }
             data = self.session.get(self.config['seriesEndpoint'] + f"{id}/episodes", params=params, headers=self.headers).json()['data']
             for episode in data:
-                print(f"Appending: {episode['episodeName']}")
                 episodes.append(episode)
         return episodes
 
@@ -124,14 +123,10 @@ class TVDB:
             'airedSeason': seasonNum,
             'airedEpisode': epNum
         }
-        try:
-            r = self.session.get(self.config['seriesEndpoint'] + f"/{id}/episodes/query", params=params, headers=self.headers).json()
-            error = r.get('Error')
-            if error:
-                raise noSuchEpisode
-        except noSuchEpisode:
-            print("No epsiode could be found. Please check season or episode number and try again.")
-            return -1
+        r = self.session.get(self.config['seriesEndpoint'] + f"/{id}/episodes/query", params=params, headers=self.headers).json()
+        error = r.get('Error')
+        if error:
+            raise noSuchEpisode("No epsiode could be found. Please check season or episode number and try again.")
         return self.cleanName(r['data'][0]['episodeName'])
 
     def cleanName(self, name):
