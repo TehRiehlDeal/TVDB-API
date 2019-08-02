@@ -24,6 +24,9 @@ class showNotFound(Error):
 class noSuchEpisode(Error):
     pass
 
+class invalidShowID(Error):
+    pass
+
 #Main TVDB object
 class TVDB:
 
@@ -82,6 +85,8 @@ class TVDB:
         if not self.__authorized:
             self.authorize()
         id = self._getShowID(name)
+        if id == -1:
+            raise invalidShowID
         return self._getEpisodeName(id, seasonNum, epNum)
 
     def _getShowID(self, name):
@@ -92,8 +97,11 @@ class TVDB:
         r = self.session.get(self.config['searchEndpoint'], params=params, headers=self.headers).json()
         error = r.get('Error')
         if error:
-            raise(Exception)
-        return r['data'][0]['id']
+            raise showNotFound
+        for show in r['data']:
+            if show['seriesName'].lower() == name.lower() or name.lower() in (alias.lower() for alias in show['aliases']):
+                return show['id']
+        return -1
 
     def _getEpisodeName(self, id, seasonNum, epNum):
         params = {
@@ -107,13 +115,5 @@ class TVDB:
         return self.cleanName(r['data'][0]['episodeName'])
 
     def cleanName(self, name):
-        newName = name.replace('\\', "")
-        newName = newName.replace("/", "")
-        newName = newName.replace(":", "")
-        newName = newName.replace("*", "")
-        newName = newName.replace("?", "")
-        newName = newName.replace('"', "")
-        newName = newName.replace("<", "")
-        newName = newName.replace(">", "")
-        newName = newName.replace("|", "")
+        newName = name.replace('\\', "").replace("/", "").replace(":", "").replace("*", "").replace("?", "").replace('"', "").replace("<", "").replace(">", "").replace("|", "")
         return newName
