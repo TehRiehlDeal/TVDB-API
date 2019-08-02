@@ -42,11 +42,11 @@ class TVDB:
 
         self.config['apiURL'] = "https://api.thetvdb.com"
 
-        self.config['searchEndpoint'] = "{}/search/series".format(self.config['apiURL'])
+        self.config['searchEndpoint'] = f"{self.config['apiURL']}/search/series"
 
-        self.config['seriesEndpoint'] = "{}/series/".format(self.config['apiURL'])
+        self.config['seriesEndpoint'] = f"{self.config['apiURL']}/series/"
 
-        self.config['loginURL'] = "{}/login".format(self.config['apiURL'])
+        self.config['loginURL'] = f"{self.config['apiURL']}/login"
 
         self.__authorized = False
         
@@ -58,7 +58,7 @@ class TVDB:
         if error:
             raise invalidCredentials
         token = r.get('token')
-        self.headers['Authorization'] = 'Bearer {}'.format(token)
+        self.headers['Authorization'] = f'Bearer {token}'
         self.__authorized = True
 
     def getShow(self, name):
@@ -120,7 +120,7 @@ class TVDB:
             'airedEpisode': epNum
         }
         try:
-            r = self.session.get(self.config['seriesEndpoint'] + "/{}/episodes/query".format(id), params=params, headers=self.headers).json()
+            r = self.session.get(self.config['seriesEndpoint'] + f"/{id}/episodes/query", params=params, headers=self.headers).json()
             error = r.get('Error')
             if error:
                 raise noSuchEpisode
