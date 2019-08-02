@@ -1,4 +1,4 @@
-#tvdbAPI
+# tvdbAPI
 This is an API library for use when connecting to The TVDB.
 
 ## How to Use
