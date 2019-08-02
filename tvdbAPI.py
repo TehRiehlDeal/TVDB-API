@@ -81,6 +81,8 @@ class TVDB:
     def getEpisodes(self, name):
         if not self.__authorized:
             self.authorize()
+        if type(name) is not str:
+            raise invalidInput("You have entered an invalid name. Please try again.")
         id = self._getShowID(name)
         if id == -1:
             raise invalidShowID("Show was not found, please try again")
