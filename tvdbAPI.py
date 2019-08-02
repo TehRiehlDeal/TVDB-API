@@ -65,12 +65,8 @@ class TVDB:
         self.__authorized = True
 
     def getShow(self, name):
-        try:
-            if type(name) is not str:
-                raise invalidInput
-        except invalidInput:
-            print("The name you inputed was invalid. Please try again.")
-            return -1
+        if type(name) is not str:
+            raise invalidInput("You have entered an invalid name. Please try again.")
         if not self.__authorized:
             self.authorize()
         params = {
@@ -78,12 +74,8 @@ class TVDB:
         }
         r = self.session.get(self.config['searchEndpoint'], params=params, headers=self.headers).json()
         error = r.get('Error')
-        try:
-            if error:
-                raise showNotFound
-        except showNotFound:
-            print("Show was not found, please try again")
-            return -1
+        if error:
+            raise showNotFound("Show was not found, please try again")
         return r
         
     def getEpisodes(self, name):
