@@ -79,7 +79,23 @@ class TVDB:
         return r
         
     def getEpisodes(self, name):
-        pass
+        if not self.__authorized:
+            self.authorize()
+        id = self._getShowID(name)
+        if id == -1:
+            raise invalidShowID
+        pages = self.session.get(self.config['seriesEndpoint'] + f"{id}/episodes", headers=self.headers).json()['links']['last']
+        episodes = []
+        for x in range(1,pages+1):
+            params = {
+                "page": x
+            }
+            data = self.session.get(self.config['seriesEndpoint'] + f"{id}/episodes", params=params, headers=self.headers).json()['data']
+            for episode in data:
+                print(f"Appending: {episode['episodeName']}")
+                episodes.append(episode)
+        return episodes
+
 
     def getEpisodeName(self, name, seasonNum, epNum):
         if not self.__authorized:
