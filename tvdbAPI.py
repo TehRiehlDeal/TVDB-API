@@ -22,6 +22,9 @@ class noSuchEpisode(Error):
 class invalidShowID(Error):
     pass
 
+class invalidInput(Error):
+    pass
+
 #Main TVDB object
 class TVDB:
 
@@ -62,6 +65,12 @@ class TVDB:
         self.__authorized = True
 
     def getShow(self, name):
+        try:
+            if type(name) is not str:
+                raise invalidInput
+        except invalidInput:
+            print("The name you inputed was invalid. Please try again.")
+            return -1
         if not self.__authorized:
             self.authorize()
         params = {
@@ -69,8 +78,12 @@ class TVDB:
         }
         r = self.session.get(self.config['searchEndpoint'], params=params, headers=self.headers).json()
         error = r.get('Error')
-        if error:
-            raise showNotFound
+        try:
+            if error:
+                raise showNotFound
+        except showNotFound:
+            print("Show was not found, please try again")
+            return -1
         return r
         
     def getEpisodes(self, name):
