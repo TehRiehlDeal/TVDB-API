@@ -48,6 +48,10 @@ class TestGetEpisodes(unittest.TestCase):
     def testB(self):
         with self.assertRaises(showNotFound):
             self.t.getEpisodes("TETSETTSTTSETT")
-
+    
+    def testC(self):
+        with self.assertRaises(invalidInput):
+            self.t.getEpisodes(-1)
+            
 if __name__ == "__main__":
     unittest.main()
