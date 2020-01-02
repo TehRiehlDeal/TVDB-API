@@ -1,7 +1,7 @@
 import requests
 import sanction
 import configparser
-
+from difflib import SequenceMatcher
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -118,8 +118,11 @@ class TVDB:
         if error:
             raise showNotFound
         for show in r['data']:
-            if show['seriesName'].lower() == name.lower() or name.lower() in (alias.lower() for alias in show['aliases']):
+            if show['seriesName'].lower() == name.lower():
                 return show['id']
+            for alias in show['aliases']:
+                if SequenceMatcher(None, name.lower(), alias.lower()).ratio() >= 0.8:
+                    return show['id']
         return -1
 
     def _getEpisodeName(self, id, seasonNum, epNum):
@@ -130,7 +133,7 @@ class TVDB:
         r = self.session.get(self.config['seriesEndpoint'] + f"/{id}/episodes/query", params=params, headers=self.headers).json()
         error = r.get('Error')
         if error:
-            raise noSuchEpisode("No epsiode could be found. Please check season or episode number and try again.")
+            raise noSuchEpisode("No episode could be found. Please check season or episode number and try again.")
         return self.cleanName(r['data'][0]['episodeName'])
 
     def cleanName(self, name):
