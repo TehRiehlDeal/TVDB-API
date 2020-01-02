@@ -34,6 +34,18 @@ class TestGetShow(unittest.TestCase):
         with self.assertRaises(invalidInput):
             assert self.t.getShow(["a", "b", "c"])
 
+    # Tests to see if a show can be successfully found based on an alias.
+    # In this case the alias is To aru Majutsu no Index, but it is being matched
+    # by string likeness.
+    def testF(self):
+        assert type(self.t.getShow("Toaru Majutsu no Index")) == dict
+
+    # Tests to see if a showID can be successfully found based on an alias.
+    # In this case the alias is To aru Majutsu no Index, but it is being matched
+    # by string likeness.
+    def testG(self):
+        assert self.t.getEpisodes("Toaru Majutsu no Index") != -1
+
 class TestGetEpisodes(unittest.TestCase):
 
     def setUp(self):
