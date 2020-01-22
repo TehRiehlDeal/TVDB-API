@@ -134,8 +134,8 @@ class TVDB:
         error = r.get('Error')
         if error:
             raise noSuchEpisode("No episode could be found. Please check season or episode number and try again.")
-        return self.cleanName(r['data'][0]['episodeName'])
+        return self._cleanName(r['data'][0]['episodeName'])
 
-    def cleanName(self, name):
+    def _cleanName(self, name):
         newName = name.replace('\\', "").replace("/", "").replace(":", "").replace("*", "").replace("?", "").replace('"', "").replace("<", "").replace(">", "").replace("|", "")
         return newName
