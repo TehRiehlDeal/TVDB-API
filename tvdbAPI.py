@@ -185,4 +185,4 @@ class TVDB:
 
     def _cleanName(self, name):
         newName = name.replace('\\', "").replace("/", "").replace(":", "").replace("*", "").replace("?", "").replace('"', "").replace("<", "").replace(">", "").replace("|", "")
-        return newName
+        return newName 
