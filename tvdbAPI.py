@@ -78,13 +78,13 @@ class TVDB:
             raise showNotFound("Show was not found, please try again")
         return r
         
-    def getEpisodes(self, name):
+    def getEpisodes(self, name, accuracy = 0.8):
         if type(name) is not str:
             raise invalidInput(
                 "You have entered an invalid name. Please try again.")
         if not self.__authorized:
             self.authorize()
-        id = self._getShowID(name)
+        id = self._getShowID(name, accuracy)
         if id == -1:
             raise invalidShowID("Show was not found, please try again")
         pages = self.session.get(self.config['seriesEndpoint'] + f"{id}/episodes", headers=self.headers).json()['links']['last']
@@ -98,18 +98,18 @@ class TVDB:
                 episodes.append(episode)
         return episodes
 
-    def getEpisodeName(self, name, seasonNum, epNum):
+    def getEpisodeName(self, name, seasonNum, epNum, accuracy = 0.8):
         if type(name) is not str or type(seasonNum) is not int or type(epNum) is not int or seasonNum < 0 or epNum < 1:
             raise invalidInput(
                 "You have entered an invalid name. Please try again.")
         if not self.__authorized:
             self.authorize()
-        id = self._getShowID(name)
+        id = self._getShowID(name,accuracy)
         if id == -1:
             raise invalidShowID
         return self._getEpisodeName(id, seasonNum, epNum)
 
-    def _getShowID(self, name):
+    def _getShowID(self, name, accuracy):
         params = {
             'name': name
         }
@@ -121,7 +121,7 @@ class TVDB:
             if show['seriesName'].lower() == name.lower():
                 return show['id']
             for alias in show['aliases']:
-                if SequenceMatcher(None, name.lower(), alias.lower()).ratio() >= 0.8:
+                if SequenceMatcher(None, name.lower(), alias.lower()).ratio() >= accuracy:
                     return show['id']
         return -1
 
