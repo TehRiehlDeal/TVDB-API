@@ -4,7 +4,7 @@ import configparser
 from difflib import SequenceMatcher
 
 config = configparser.ConfigParser()
-config.read('config.ini')
+config.read('Config.ini')
 
 #Exceptions
 class Error(Exception):
