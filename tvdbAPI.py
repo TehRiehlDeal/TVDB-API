@@ -10,19 +10,22 @@ config.read('Config.ini')
 class Error(Exception):
     pass
 
-class invalidCredentials(Error):
+class InvalidCredentials(Error):
     pass
 
-class showNotFound(Error):
+class ShowNotFound(Error):
     pass
 
-class noSuchEpisode(Error):
+class NoSuchEpisode(Error):
     pass
 
-class invalidShowID(Error):
+class InvalidShowID(Error):
     pass
 
-class invalidInput(Error):
+class InvalidInput(Error):
+    pass
+
+class NoActorsFound(Error):
     pass
 
 #Main TVDB object
@@ -62,14 +65,14 @@ class TVDB:
             name {String} -- The name of the show you are searching for.
         
         Raises:
-            invalidInput -- Raises if a non string is entered for name.
-            showNotFound -- Raises if no show was found for the given name/alias.
+            InvalidInput: Raises if a non string is entered for name.
+            ShowNotFound: Raises if no show was found for the given name/alias.
         
         Returns:
             dict -- Returns a dictionary containg basic data about the show.
         """
         if type(name) is not str:
-            raise invalidInput("You have entered an invalid name. Please try again.")
+            raise InvalidInput("You have entered an invalid name. Please try again.")
         if not self.__authorized:
             self._authorize()
         params = {
@@ -78,7 +81,7 @@ class TVDB:
         r = self.session.get(self.config['searchEndpoint'], params=params, headers=self.headers).json()
         error = r.get('Error')
         if error:
-            raise showNotFound("Show was not found, please try again")
+            raise ShowNotFound("Show was not found, please try again")
         return r
         
     def getEpisodes(self, name, accuracy = 0.8):
@@ -91,20 +94,20 @@ class TVDB:
             accuracy {float} -- If no show with title found, how accurate should a match to the alias be. (default: {0.8})
         
         Raises:
-            invalidInput -- Raises if a non string is inputed for name.
-            invalidShowID -- Raises if a show was not found.
+            InvalidInput: Raises if a non string is inputed for name.
+            InvalidShowID: Raises if a show was not found.
         
         Returns:
             list -- Returns a list of all the episodes for a given show.
         """
         if type(name) is not str:
-            raise invalidInput(
+            raise InvalidInput(
                 "You have entered an invalid name. Please try again.")
         if not self.__authorized:
             self._authorize()
         id = self._getShowID(name, accuracy)
         if id == -1:
-            raise invalidShowID("Show was not found, please try again")
+            raise InvalidShowID("Show was not found, please try again")
         pages = self.session.get(self.config['seriesEndpoint'] + f"{id}/episodes", headers=self.headers).json()['links']['last']
         episodes = []
         for x in range(1,pages+1):
@@ -129,29 +132,42 @@ class TVDB:
             accuracy {float} -- If no show with title found, how accurate should a match to the alias be. (default: {0.8})
         
         Raises:
-            invalidInput -- Raises if a non string is inputed for name.
-            invalidShowID -- Raises if a show was not found.
+            InvalidInput: Raises if a non string is inputed for name.
+            InvalidShowID: Raises if a show was not found.
         
         Returns:
             String -- Returns the name of the episode searched for, cleaned of all special characters.
         """
         if type(name) is not str or type(seasonNum) is not int or type(epNum) is not int or seasonNum < 0 or epNum < 1:
-            raise invalidInput(
+            raise InvalidInput(
                 "You have entered an invalid name. Please try again.")
         if not self.__authorized:
             self._authorize()
         id = self._getShowID(name,accuracy)
         if id == -1:
-            raise invalidShowID
+            raise InvalidShowID
         return self._getEpisodeName(id, seasonNum, epNum)
 
+    def getActors(self, name, accuracy=0.8):
+        if type(name) is not str:
+            raise InvalidInput(
+                "You have entered an invalid name. Please try again.")
+        if not self.__authorized:
+            self._authorize()
+        id = self._getShowID(name, accuracy)
+        if id == -1:
+            raise InvalidShowID("Show was not found, please try again")
+        return self._getActors(id)
+
+    def getImages(self, showID):
+        pass
 
     def _authorize(self):
         r = self.session.post(
             self.config['loginURL'], json=self.config['authPayload'], headers=self.headers).json()
         error = r.get('Error')
         if error:
-            raise invalidCredentials
+            raise InvalidCredentials
         token = r.get('token')
         self.headers['Authorization'] = f'Bearer {token}'
         self.__authorized = True
@@ -163,7 +179,7 @@ class TVDB:
         r = self.session.get(self.config['searchEndpoint'], params=params, headers=self.headers).json()
         error = r.get('Error')
         if error:
-            raise showNotFound
+            raise ShowNotFound
         for show in r['data']:
             if show['seriesName'].lower() == name.lower():
                 return show['id']
@@ -180,8 +196,16 @@ class TVDB:
         r = self.session.get(self.config['seriesEndpoint'] + f"/{id}/episodes/query", params=params, headers=self.headers).json()
         error = r.get('Error')
         if error:
-            raise noSuchEpisode("No episode could be found. Please check season or episode number and try again.")
+            raise NoSuchEpisode("No episode could be found. Please check season or episode number and try again.")
         return self._cleanName(r['data'][0]['episodeName'])
+
+    def _getActors(self, showID):
+        r = self.session.get(self.config['seriesEndpoint'] + f"{showID}/actors", headers=self.headers).json()
+        error = r.get('Error')
+        if error:
+            raise NoActorsFound("No actors found for specific show.")
+        print(r)
+        return r
 
     def _cleanName(self, name):
         newName = name.replace('\\', "").replace("/", "").replace(":", "").replace("*", "").replace("?", "").replace('"', "").replace("<", "").replace(">", "").replace("|", "")

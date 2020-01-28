@@ -1,7 +1,7 @@
 import unittest
 import sys
 sys.path.append("..")
-from tvdbAPI import TVDB, showNotFound, invalidInput, invalidShowID, noSuchEpisode
+from tvdbAPI import TVDB, ShowNotFound, InvalidInput, InvalidShowID, NoSuchEpisode, NoActorsFound
 
 class TestGetShow(unittest.TestCase):
 
@@ -18,20 +18,20 @@ class TestGetShow(unittest.TestCase):
     # Test to see if showNotFound is raised correctly
     def testB(self):
         #self.failUnlessRaises(showNotFound, self.t.getShow("TETSTSETSTSETT"))
-        with self.assertRaises(showNotFound):
+        with self.assertRaises(ShowNotFound):
             self.t.getShow('TESTSETETS')
 
     # Tests to see if invalidInput is raised correctly
     def testC(self):
-        with self.assertRaises(invalidInput):
+        with self.assertRaises(InvalidInput):
             self.t.getShow(-1)
 
     def testD(self):
-        with self.assertRaises(invalidInput):
+        with self.assertRaises(InvalidInput):
             self.t.getShow({'test': "test"})
 
     def testE(self):
-        with self.assertRaises(invalidInput):
+        with self.assertRaises(InvalidInput):
             assert self.t.getShow(["a", "b", "c"])
 
     # Tests to see if a show can be successfully found based on an alias.
@@ -58,11 +58,11 @@ class TestGetEpisodes(unittest.TestCase):
         assert type(self.t.getEpisodes("Mythbusters")) == list
 
     def testB(self):
-        with self.assertRaises(showNotFound):
+        with self.assertRaises(ShowNotFound):
             self.t.getEpisodes("TETSETTSTTSETT")
     
     def testC(self):
-        with self.assertRaises(invalidInput):
+        with self.assertRaises(InvalidInput):
             self.t.getEpisodes(-1)
 
 class TestGetEpisodeName(unittest.TestCase):
@@ -77,32 +77,43 @@ class TestGetEpisodeName(unittest.TestCase):
         assert type(self.t.getEpisodeName("Mythbusters", 2003, 1)) == str
     
     def testB(self):
-        with self.assertRaises(showNotFound):
+        with self.assertRaises(ShowNotFound):
             self.t.getEpisodeName("TESTSETTSETST", 1, 1)
 
     def testC(self):
-        with self.assertRaises(noSuchEpisode):
+        with self.assertRaises(NoSuchEpisode):
             self.t.getEpisodeName("Mythbusters", 1, 1)
 
     def testD(self):
-        with self.assertRaises(invalidInput):
+        with self.assertRaises(InvalidInput):
             self.t.getEpisodeName(-1, 1, 1)
 
     def testE(self):
-        with self.assertRaises(invalidInput):
+        with self.assertRaises(InvalidInput):
             self.t.getEpisodeName("Mythbusters", "1", 1)
 
     def testF(self):
-        with self.assertRaises(invalidInput):
+        with self.assertRaises(InvalidInput):
             self.t.getEpisodeName("Mythbusters", 1, "1")
 
     def testG(self):
-        with self.assertRaises(invalidInput):
+        with self.assertRaises(InvalidInput):
             self.t.getEpisodeName("Mythbusters", -1, 1)
 
     def testH(self):
-        with self.assertRaises(invalidInput):
-            self.t.getEpisodeName("Mythbusters", 1, -1)    
+        with self.assertRaises(InvalidInput):
+            self.t.getEpisodeName("Mythbusters", 1, -1)  
+
+class TestGetActors(unittest.TestCase):
+
+    def setUp(self):
+        self.t = TVDB()
+
+    def tearDown(self):
+        self.t.session.close()
+
+    def testA(self):
+        assert type(self.t.getActors("Mythbusters")) == list
 
 if __name__ == "__main__":
     unittest.main()
