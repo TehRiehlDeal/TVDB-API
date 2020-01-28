@@ -204,7 +204,6 @@ class TVDB:
         error = r.get('Error')
         if error:
             raise NoActorsFound("No actors found for specific show.")
-        print(r)
         return r
 
     def _cleanName(self, name):

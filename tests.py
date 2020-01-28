@@ -113,7 +113,7 @@ class TestGetActors(unittest.TestCase):
         self.t.session.close()
 
     def testA(self):
-        assert type(self.t.getActors("Mythbusters")) == list
+        assert type(self.t.getActors("Mythbusters")) == dict
 
 if __name__ == "__main__":
     unittest.main()
