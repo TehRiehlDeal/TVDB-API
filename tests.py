@@ -115,5 +115,16 @@ class TestGetActors(unittest.TestCase):
     def testA(self):
         assert type(self.t.getActors("Mythbusters")) == dict
 
+class TestGetImages(unittest.TestCase):
+
+    def setUp(self):
+        self.t = TVDB()
+
+    def tearDown(self):
+        self.t.session.close()
+
+    def testA(self):
+        assert type(self.t.getImages("Mythbusters")) == list
+
 if __name__ == "__main__":
     unittest.main()
