@@ -255,7 +255,6 @@ class TVDB:
             raise NoImagesFound("No images were found for the show of that type")
         for image in r['data']:
             images.append(self.config['imageURL'] + image['fileName'])
-        print(images)
         return images
 
     def _cleanName(self, name):
