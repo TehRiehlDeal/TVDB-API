@@ -54,6 +54,8 @@ class TVDB:
 
         self.config['loginURL'] = f"{self.config['apiURL']}/login"
 
+        self.config['imageURL'] = "https://thetvdb.com/banners/"
+
         self.__authorized = False
         
         self.session = requests.Session()
@@ -149,6 +151,21 @@ class TVDB:
         return self._getEpisodeName(id, seasonNum, epNum)
 
     def getActors(self, name, accuracy=0.8):
+        """Gets a dictionary of all actors for a given show as well as information on them, and returns it to the user.
+        
+        Arguments:
+            name {String} -- The name of the show.
+        
+        Keyword Arguments:
+            accuracy {float} -- If no show with title found, how accurate should a match to the alias be. (default: {0.8})
+        
+        Raises:
+            InvalidInput: Raises if a non string is inputed for name.
+            InvalidShowID: Raises if a show was not found.
+        
+        Returns:
+            dict -- A dictionary of all actors for the show, as well as information about them.
+        """
         if type(name) is not str:
             raise InvalidInput(
                 "You have entered an invalid name. Please try again.")
