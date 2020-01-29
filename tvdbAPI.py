@@ -27,6 +27,8 @@ class InvalidInput(Error):
 
 class NoActorsFound(Error):
     pass
+class NoImagesFound(Error):
+    pass
 
 #Main TVDB object
 class TVDB:
@@ -176,8 +178,27 @@ class TVDB:
             raise InvalidShowID("Show was not found, please try again")
         return self._getActors(id)
 
-    def getImages(self, showID):
-        pass
+    def getImages(self, name, imageType = "series", accuracy = 0.8):
+        """Grabs the urls for the images of the show based on the type you have selected. Default grabs 'series' image urls,
+        and returns them in a list.
+        
+        Arguments:
+            name {String} -- The name of the show.
+        
+        Keyword Arguments:
+            imageType {str} -- fanart, poster, season, seasonwide, series, all (default: {"series"})
+            accuracy {float} -- If no show with title found, how accurate should a match to the alias be. (default: {0.8})
+
+        Returns:
+            list -- A list of the image urls for the given show.
+        """
+        if type(name) is not str:
+            raise InvalidInput(
+                "You have entered an invalid name. Please try again.")
+        if not self.__authorized:
+            self._authorize()
+        id = self._getShowID(name, accuracy)
+        return self._getImages(id, imageType)
 
     def _authorize(self):
         r = self.session.post(
@@ -222,6 +243,20 @@ class TVDB:
         if error:
             raise NoActorsFound("No actors found for specific show.")
         return r
+
+    def _getImages(self, showID, imageType):
+        images = []
+        params = {
+            'keyType': imageType
+        }
+        r = self.session.get(self.config['seriesEndpoint'] + f"{showID}/images/query", params=params, headers=self.headers).json()
+        error = r.get('Error')
+        if error:
+            raise NoImagesFound("No images were found for the show of that type")
+        for image in r['data']:
+            images.append(self.config['imageURL'] + image['fileName'])
+        print(images)
+        return images
 
     def _cleanName(self, name):
         newName = name.replace('\\', "").replace("/", "").replace(":", "").replace("*", "").replace("?", "").replace('"', "").replace("<", "").replace(">", "").replace("|", "")
