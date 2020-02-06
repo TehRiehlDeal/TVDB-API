@@ -2,9 +2,6 @@ import requests
 import sanction
 from difflib import SequenceMatcher
 
-config = configparser.ConfigParser()
-config.read('Config.ini')
-
 #Exceptions
 class Error(Exception):
     pass
