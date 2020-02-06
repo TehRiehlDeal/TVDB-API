@@ -1,6 +1,5 @@
 import requests
 import sanction
-import configparser
 from difflib import SequenceMatcher
 
 config = configparser.ConfigParser()
@@ -33,7 +32,7 @@ class NoImagesFound(Error):
 #Main TVDB object
 class TVDB:
 
-    def __init__(self, apikey=config['CREDENTIALS']['APIKEY']):
+    def __init__(self, apikey='0C9MXRI7C0X5J1QH'):
         self.headers = {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
@@ -43,7 +42,7 @@ class TVDB:
         self.config = {}
 
         self.config['authPayload'] = {
-            'apikey': config['CREDENTIALS']['APIKEY'],
+            'apikey': '0C9MXRI7C0X5J1QH',
             'username': '',
             'userkey': ''
         }
