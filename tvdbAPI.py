@@ -215,7 +215,7 @@ class TVDB:
         if error:
             raise ShowNotFound
         for show in r['data']:
-            if show['seriesName'].lower() == name.lower():
+            if SequenceMatcher(None, name.lower(), show['seriesName'].lower()).ratio() >= accuracy:
                 return show['id']
             for alias in show['aliases']:
                 if SequenceMatcher(None, name.lower(), alias.lower()).ratio() >= accuracy:
