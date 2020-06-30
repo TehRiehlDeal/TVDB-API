@@ -130,6 +130,7 @@ class TVDB:
         
         Keyword Arguments:
             accuracy {float} -- If no show with title found, how accurate should a match to the alias be. (default: {0.8})
+            id -- Optional input of show id when searching for episode names.
         
         Raises:
             InvalidInput: Raises if a non string is inputed for name.
