@@ -119,7 +119,7 @@ class TVDB:
                 episodes.append(episode)
         return episodes
 
-    def getEpisodeName(self, name, seasonNum, epNum, accuracy = 0.8):
+    def getEpisodeName(self, name, seasonNum, epNum, accuracy = 0.8, id = None):
         """ Gets an episode by its name, based on the show name, season number, and episode number, and
             cleaned of any special characters so it can be used to name files without error.
         
@@ -143,7 +143,10 @@ class TVDB:
                 "You have entered an invalid name. Please try again.")
         if not self.__authorized:
             self._authorize()
-        id = self._getShowID(name,accuracy)
+        if (id == None):
+            id = self._getShowID(name,accuracy)
+        else:
+            return self._getEpisodeName(id, seasonNum, epNum)
         if id == -1:
             raise InvalidShowID
         return self._getEpisodeName(id, seasonNum, epNum)
