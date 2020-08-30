@@ -119,7 +119,7 @@ class TVDB:
                 episodes.append(episode)
         return episodes
 
-    def getEpisodeName(self, name, seasonNum, epNum, accuracy = 0.8, id = None):
+    def getEpisodeName(self, name, seasonNum, epNum, order = "", accuracy = 0.8, id = None):
         """ Gets an episode by its name, based on the show name, season number, and episode number, and
             cleaned of any special characters so it can be used to name files without error.
         
@@ -147,10 +147,10 @@ class TVDB:
         if (id == None):
             id = self._getShowID(name,accuracy)
         else:
-            return self._getEpisodeName(id, seasonNum, epNum)
+            return self._getEpisodeName(id, seasonNum, epNum, order)
         if id == -1:
             raise InvalidShowID
-        return self._getEpisodeName(id, seasonNum, epNum)
+        return self._getEpisodeName(id, seasonNum, epNum, order)
 
     def getActors(self, name, accuracy=0.8):
         """Gets a dictionary of all actors for a given show as well as information on them, and returns it to the user.
@@ -226,11 +226,22 @@ class TVDB:
                     return show['id']
         return -1
 
-    def _getEpisodeName(self, id, seasonNum, epNum):
-        params = {
-            'airedSeason': seasonNum,
-            'airedEpisode': epNum
-        }
+    def _getEpisodeName(self, id, seasonNum, epNum, order):
+        if 'DVD' in order:
+            params = {
+                'dvdSeason': seasonNum,
+                'dvdEpisode': epNum
+            }
+        elif 'AIRED' in order:
+            params = {
+                'airedSeason': seasonNum,
+                'airedEpisode': epNum
+            }
+        else:
+            params = {
+                'airedSeason': seasonNum,
+                'airedEpisode': epNum
+            }
         r = self.session.get(self.config['seriesEndpoint'] + f"/{id}/episodes/query", params=params, headers=self.headers).json()
         error = r.get('Error')
         if error:
