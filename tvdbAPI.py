@@ -260,7 +260,7 @@ class TVDB:
         params = {
             'keyType': imageType
         }
-        r = self.session.get(self.config['seriesEndpoint'] + f"{showID}/images/query", params=params, headers=self.headers).json()
+        r = self.session.get(self.config['seriesEndpoint'] + f"{showID}/images/query?", params=params, headers=self.headers).json()
         error = r.get('Error')
         if error:
             raise NoImagesFound("No images were found for the show of that type")
