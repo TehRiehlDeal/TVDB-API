@@ -178,7 +178,7 @@ class TVDB:
             raise InvalidShowID("Show was not found, please try again")
         return self._getActors(id)
 
-    def getImages(self, name, imageType = "series", accuracy = 0.8):
+    def getImages(self, name, imageType = "poster", accuracy = 0.8):
         """Grabs the urls for the images of the show based on the type you have selected. Default grabs 'series' image urls,
         and returns them in a list.
         
