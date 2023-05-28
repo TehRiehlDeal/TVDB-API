@@ -268,7 +268,7 @@ class TVDB:
             return episodeName
         return self._cleanName(r['data'][0]['episodeName'])
 
-    def _fallbackGetEpisodeName(self, id, order, epNum,):
+    def _fallbackGetEpisodeName(self, id, order, epNum):
         if id == -1:
             raise InvalidShowID("Show was not found, please try again")
         pages = self.session.get(
