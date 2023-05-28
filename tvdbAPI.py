@@ -145,6 +145,7 @@ class TVDB:
             epNum {integer} -- The episode number in the season.
 
         Keyword Arguments:
+            order {String} -- Specifies the episode number ordering to parse ("DVD", "Aired")
             accuracy {float} -- If no show with title found, how accurate should a match to the alias be. (default: {0.8})
             id -- Optional input of show id when searching for episode names.
 
