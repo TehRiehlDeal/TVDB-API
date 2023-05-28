@@ -264,7 +264,7 @@ class TVDB:
         error = r.get('Error')
         if error:
             # raise NoSuchEpisode("No episode could be found. Please check season or episode number and try again.")
-            episodeName = self._fallbackGetEpisodeName(self, id, order, epNum)
+            episodeName = self._fallbackGetEpisodeName(id, order, epNum)
             return episodeName
         return self._cleanName(r['data'][0]['episodeName'])
 
